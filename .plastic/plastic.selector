@@ -1,0 +1,4 @@
+repository "Lab2/Lab2@33263636880102@cloud"
+  path "/"
+    br "/main"
+    co "/main"
