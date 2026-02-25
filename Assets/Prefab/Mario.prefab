@@ -135,7 +135,7 @@ MonoBehaviour:
   bigMarioController: {fileID: 22100000, guid: 2fb097c2454b6164b84ca3a417eaae08, type: 2}
   groundLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 8
   groundCheck: {fileID: 2114825320935170960}
   checkRadius: 0.3
 --- !u!50 &3139185694848851471
