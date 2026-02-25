@@ -3942,6 +3942,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2900847739523767706, guid: f12363c4a3af80f44a63151bd47ca211, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3193646652589263157, guid: f12363c4a3af80f44a63151bd47ca211, type: 3}
       propertyPath: m_LocalPosition.x
       value: -67.1
@@ -3985,6 +3989,10 @@ PrefabInstance:
     - target: {fileID: 6255554736074964270, guid: f12363c4a3af80f44a63151bd47ca211, type: 3}
       propertyPath: m_Name
       value: Mario
+      objectReference: {fileID: 0}
+    - target: {fileID: 8261978490800489373, guid: f12363c4a3af80f44a63151bd47ca211, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
