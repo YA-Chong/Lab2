@@ -7,7 +7,7 @@ public class Teleport : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         //Please note that this code assumes the player has a tag "Player" assigned to it in the Unity Editor.
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Mario"))
         {
             other.transform.position = targetPoint.position;
         }
