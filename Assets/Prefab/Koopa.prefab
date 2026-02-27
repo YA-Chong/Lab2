@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2368622117671873936}
   - component: {fileID: 5497408426335256142}
   - component: {fileID: 918180982134550295}
-  - component: {fileID: 1606620902655725691}
   - component: {fileID: 4665120586843972671}
   - component: {fileID: 7033459120261898352}
   m_Layer: 0
@@ -117,18 +116,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1606620902655725691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4609757812081041840}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b5620bedcd52cdc4e9e769fc9603bf0c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KoopaController
 --- !u!61 &4665120586843972671
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -192,4 +179,11 @@ MonoBehaviour:
   usePatrolRange: 1
   leftBound: 0
   rightBound: 5
+  stompAnimTrigger: Die
+  destroyOnStomp: 1
+  stompDestroyDelay: 0.5
+  becomeShellOnStomp: 0
+  shellSlideSpeed: 12
+  shellMaxDistance: 20
+  shellAnimBool: isShell
   movementEnabled: 1

@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 挂在主角上，负责：踩头判定、踩头反弹、被敌人碰到受伤/死亡。
-/// 敌人侧只认 MonsterController（踩头调用 Stomped，侧面碰到则主角受伤）。当前仅做普通小马里奥。
+/// 大马里奥被侧面碰到时只缩小不变小马、不重载关卡；小马里奥被碰到则死亡并可选重载。
 /// </summary>
 public class MarioCombat : MonoBehaviour
 {
@@ -50,7 +50,12 @@ public class MarioCombat : MonoBehaviour
             }
         }
 
-        // 从侧面或下面碰到 → 马里奥受伤
+        // 从侧面或下面碰到 → 大马缩小，小马死亡
+        if (marioController != null && marioController.IsBig)
+        {
+            marioController.ShrinkToSmall();
+            return;
+        }
         TakeDamage();
     }
 
@@ -58,6 +63,18 @@ public class MarioCombat : MonoBehaviour
     {
         if (rb != null)
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, stompBounceSpeed);
+    }
+
+    /// <summary> 被龟壳等击中时由 MonsterController 调用，效果同被怪物侧面碰到（大马缩小，小马死亡） </summary>
+    public void OnHitByEnemy()
+    {
+        if (isDead) return;
+        if (marioController != null && marioController.IsBig)
+        {
+            marioController.ShrinkToSmall();
+            return;
+        }
+        TakeDamage();
     }
 
     private void TakeDamage()

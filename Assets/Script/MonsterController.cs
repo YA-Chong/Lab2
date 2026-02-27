@@ -19,17 +19,30 @@ public class MonsterController : MonoBehaviour
     public float rightBound = 5f;
 
     [Header("被踩")]
-    [Tooltip("被踩时触发的 Animator Trigger 名，不填则不播动画")]
+    [Tooltip("被踩时触发的 Animator Trigger 名，不填则不播动画（变壳时不使用）")]
     public string stompAnimTrigger = "Die";
-    [Tooltip("被踩后是否销毁物体")]
+    [Tooltip("被踩后是否销毁物体（乌龟勾选「变壳」时此项不生效）")]
     public bool destroyOnStomp = true;
     [Tooltip("销毁前延迟（秒）")]
     public float stompDestroyDelay = 0.5f;
 
+    [Header("龟壳（仅乌龟勾选）")]
+    [Tooltip("勾选后，被踩时变为壳并沿原行进方向滑动，不销毁")]
+    public bool becomeShellOnStomp = false;
+    [Tooltip("壳滑动速度")]
+    public float shellSlideSpeed = 12f;
+    [Tooltip("壳滑动超过此距离后销毁")]
+    public float shellMaxDistance = 20f;
+    [Tooltip("变壳时设置的 Animator Bool 参数名")]
+    public string shellAnimBool = "isShell";
+
     private int direction;
     private SpriteRenderer spriteRenderer;
     private Animator anim;
+    private Rigidbody2D rb;
     private bool stomped;
+    private bool isShell;
+    private float shellSlideDistanceTraveled;
 
     /// <summary> 为 false 时不再移动（被踩、变壳等） </summary>
     [HideInInspector]
@@ -40,6 +53,7 @@ public class MonsterController : MonoBehaviour
         direction = initialDirection;
         spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     /// <summary> 被主角踩头时由 MarioCombat 调用 </summary>
@@ -49,21 +63,55 @@ public class MonsterController : MonoBehaviour
         stomped = true;
         movementEnabled = false;
 
+        var scoreComp = GetComponent<MonsterStompScore>();
+        if (scoreComp != null) scoreComp.GrantStompScore();
+
+        if (becomeShellOnStomp)
+        {
+            isShell = true;
+            if (anim != null && !string.IsNullOrEmpty(shellAnimBool))
+                anim.SetBool(shellAnimBool, true);
+            if (spriteRenderer != null) spriteRenderer.flipX = false;
+
+            if (rb != null)
+            {
+                // 保持 Dynamic，让物理引擎真正阻挡碰撞；关掉重力，只水平滑动
+                rb.bodyType = RigidbodyType2D.Dynamic;
+                rb.gravityScale = 0f;
+                rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+                rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+                rb.linearVelocity = new Vector2(direction * shellSlideSpeed, 0f);
+            }
+            return;
+        }
+
         if (anim != null && !string.IsNullOrEmpty(stompAnimTrigger))
             anim.SetTrigger(stompAnimTrigger);
 
         var col = GetComponent<Collider2D>();
         if (col != null) col.enabled = false;
 
-        var scoreComp = GetComponent<MonsterStompScore>();
-        if (scoreComp != null) scoreComp.GrantStompScore();
-
         if (destroyOnStomp)
             Destroy(gameObject, stompDestroyDelay);
     }
 
+    private void FixedUpdate()
+    {
+        if (isShell && rb != null)
+        {
+            // 保持速度恒定（Dynamic 刚体受摩擦力等可能减速）
+            rb.linearVelocity = new Vector2(direction * shellSlideSpeed, rb.linearVelocity.y);
+
+            shellSlideDistanceTraveled += shellSlideSpeed * Time.fixedDeltaTime;
+            if (shellSlideDistanceTraveled >= shellMaxDistance)
+                Destroy(gameObject);
+        }
+    }
+
     private void Update()
     {
+        if (isShell) return;
+
         if (!movementEnabled) return;
 
         transform.Translate(Vector2.right * direction * speed * Time.deltaTime);
@@ -81,6 +129,20 @@ public class MonsterController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (isShell)
+        {
+            if (collision.gameObject.CompareTag("Mario"))
+            {
+                var combat = collision.gameObject.GetComponent<MarioCombat>();
+                if (combat != null) combat.OnHitByEnemy();
+            }
+            // 撞墙或撞到马里奥后反向，更新速度方向
+            direction *= -1;
+            if (rb != null)
+                rb.linearVelocity = new Vector2(direction * shellSlideSpeed, rb.linearVelocity.y);
+            return;
+        }
+
         if (!movementEnabled || stomped) return;
         direction *= -1;
     }
