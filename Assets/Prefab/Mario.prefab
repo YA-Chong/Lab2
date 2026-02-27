@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5692795774705007166}
   - component: {fileID: 3139185694848851471}
   - component: {fileID: 2900847739523767706}
+  - component: {fileID: 3513268683185151807}
   m_Layer: 7
   m_Name: Mario
   m_TagString: Mario
@@ -211,6 +212,21 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.15, y: 0.17}
   m_EdgeRadius: 0
+--- !u!114 &3513268683185151807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6255554736074964270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92d60bc9c91ff9344a71f1500950b2c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MarioCombat
+  stompBounceSpeed: 12
+  stompNormalYThreshold: 0.5
+  deathReloadDelay: 2
 --- !u!1 &8932653786840880221
 GameObject:
   m_ObjectHideFlags: 0
