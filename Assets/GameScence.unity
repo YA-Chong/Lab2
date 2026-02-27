@@ -1845,13 +1845,34 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7819471609636536342, guid: 9184ffa22038fbb469a3dae234a66665, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 742516358}
   m_SourcePrefab: {fileID: 100100000, guid: 9184ffa22038fbb469a3dae234a66665, type: 3}
+--- !u!1 &742516352 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7819471609636536342, guid: 9184ffa22038fbb469a3dae234a66665, type: 3}
+  m_PrefabInstance: {fileID: 742516351}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &742516357 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8631918333555672806, guid: 9184ffa22038fbb469a3dae234a66665, type: 3}
   m_PrefabInstance: {fileID: 742516351}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &742516358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 742516352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13c6f7d3ea8f2964fab1882c278d17b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterStompScore
+  stompScore: 100
 --- !u!1001 &817948526
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3899,13 +3920,34 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4609757812081041840, guid: 57dee2408d617ab42b39856269cddf43, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1440967520}
   m_SourcePrefab: {fileID: 100100000, guid: 57dee2408d617ab42b39856269cddf43, type: 3}
+--- !u!1 &1440967514 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4609757812081041840, guid: 57dee2408d617ab42b39856269cddf43, type: 3}
+  m_PrefabInstance: {fileID: 1440967513}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1440967519 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2368622117671873936, guid: 57dee2408d617ab42b39856269cddf43, type: 3}
   m_PrefabInstance: {fileID: 1440967513}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1440967520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1440967514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13c6f7d3ea8f2964fab1882c278d17b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterStompScore
+  stompScore: 200
 --- !u!1 &1478768679
 GameObject:
   m_ObjectHideFlags: 0

@@ -55,6 +55,9 @@ public class MonsterController : MonoBehaviour
         var col = GetComponent<Collider2D>();
         if (col != null) col.enabled = false;
 
+        var scoreComp = GetComponent<MonsterStompScore>();
+        if (scoreComp != null) scoreComp.GrantStompScore();
+
         if (destroyOnStomp)
             Destroy(gameObject, stompDestroyDelay);
     }
