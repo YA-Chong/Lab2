@@ -132,8 +132,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MarioController
   moveSpeed: 5
-  jumpForce: 6.5
+  jumpForce: 9
   bigMarioController: {fileID: 22100000, guid: 2fb097c2454b6164b84ca3a417eaae08, type: 2}
+  bigMarioDuration: 8
   fireballPrefab: {fileID: 2142547655071028474, guid: 09ac07012145fb145b08f96d21b18826, type: 3}
   fireKey: 122
   maxFireballs: 3

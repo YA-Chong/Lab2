@@ -13,6 +13,11 @@ public class MarioController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private BoxCollider2D col;
 
+    [Header("大马里奥持续时间")]
+    [Tooltip("变大后持续的秒数，0 表示永久")]
+    public float bigMarioDuration = 8f;
+    private Coroutine bigMarioTimerCoroutine;
+
     [Header("火球")]
     [Tooltip("火球 Prefab（需挂 FireballController，Collider2D 勾 Is Trigger）")]
     public GameObject fireballPrefab;
@@ -100,10 +105,18 @@ public class MarioController : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
-        isBig = !isBig;
-        anim.runtimeAnimatorController = isBig ? bigMarioController : smallMarioController;
+        isBig = true;
+        anim.runtimeAnimatorController = bigMarioController != null ? bigMarioController : smallMarioController;
 
         inPowerUpSequence = false;
+
+        // 启动倒计时（若已有计时器则重置）
+        if (bigMarioDuration > 0f)
+        {
+            if (bigMarioTimerCoroutine != null)
+                StopCoroutine(bigMarioTimerCoroutine);
+            bigMarioTimerCoroutine = StartCoroutine(BigMarioTimer());
+        }
 
         // --- ??????????? Center ????????????? ---
         // ?????????? Hs??????? Hb?????????????????????? Offset ???????
@@ -143,11 +156,31 @@ public class MarioController : MonoBehaviour
         activeFireballs = Mathf.Max(0, activeFireballs - 1);
     }
 
-    /// <summary> 被怪物碰到时由 MarioCombat 调用，大马缩小，小马死亡 </summary>
+    private IEnumerator BigMarioTimer()
+    {
+        yield return new WaitForSeconds(bigMarioDuration);
+        ShrinkToSmall();
+    }
+
+    /// <summary> 吃到道具时调用，仅在小马里奥状态下触发变大流程 </summary>
+    public void PowerUp()
+    {
+        if (isBig || inPowerUpSequence) return;
+        StartCoroutine(PowerUpSequence());
+    }
+
+    /// <summary> 被怪物碰到或倒计时结束时调用，变回小马里奥 </summary>
     public void ShrinkToSmall()
     {
         if (!isBig) return;
         isBig = false;
+
+        if (bigMarioTimerCoroutine != null)
+        {
+            StopCoroutine(bigMarioTimerCoroutine);
+            bigMarioTimerCoroutine = null;
+        }
+
         if (anim != null && smallMarioController != null)
             anim.runtimeAnimatorController = smallMarioController;
     }

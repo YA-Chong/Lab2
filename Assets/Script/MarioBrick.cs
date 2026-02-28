@@ -11,6 +11,10 @@ public class MarioBrick : MonoBehaviour
     public GameObject coinPrefab;
     public float coinSpawnHeight = 0.6f;
 
+    [Header("Power-Up Settings")]
+    [Tooltip("若设置了此项，顶砖块时弹出道具（花/蘑菇）而非金币")]
+    public GameObject powerUpPrefab;
+
     [Header("Sprites")]
     public Sprite usedSprite;
 
@@ -49,13 +53,13 @@ public class MarioBrick : MonoBehaviour
 
     void SpawnCoin()
     {
-        if (coinPrefab != null)
+        // 若设置了道具 Prefab，弹道具；否则弹金币
+        GameObject toSpawn = powerUpPrefab != null ? powerUpPrefab : coinPrefab;
+        if (toSpawn != null)
         {
-            Instantiate(
-                coinPrefab,
-                transform.position + Vector3.up * coinSpawnHeight,
-                Quaternion.identity
-            );
+            Vector3 spawnPos = transform.position + Vector3.up * coinSpawnHeight;
+            spawnPos.z = -2f;
+            Instantiate(toSpawn, spawnPos, Quaternion.identity);
         }
     }
 
