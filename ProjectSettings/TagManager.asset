@@ -5,18 +5,19 @@ TagManager:
   serializedVersion: 3
   tags:
   - Coin
+  - Mario
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
+  - Wall
+  - Monster
   - 
   - 
-  - 
-  - 
-  - 
+  - Ground
   - 
   - 
   - 
