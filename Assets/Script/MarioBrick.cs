@@ -28,17 +28,14 @@ public class MarioBrick : MonoBehaviour
     {
         if (isUsed) return;
 
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Mario"))
         {
             foreach (ContactPoint2D contact in collision.contacts)
             {
-                // Must hit from below
                 if (contact.normal.y > 0.5f)
                 {
                     StartCoroutine(Bounce());
-
                     SpawnCoin();
-
                     isUsed = true;
 
                     if (usedSprite != null)
