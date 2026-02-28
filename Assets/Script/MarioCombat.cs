@@ -88,11 +88,15 @@ public class MarioCombat : MonoBehaviour
         if (anim != null)
             anim.SetTrigger("Die");
 
-        if (deathHintUI != null)
-            deathHintUI.SetActive(true);
+        //if (deathHintUI != null)
+        //    deathHintUI.SetActive(true);
 
-        if (deathReloadDelay > 0f)
-            Invoke(nameof(ReloadCurrentScene), deathReloadDelay);
+        //if (deathReloadDelay > 0f)
+        //    Invoke(nameof(ReloadCurrentScene), deathReloadDelay);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.GameOver();
+        }
     }
 
     private void ReloadCurrentScene()
