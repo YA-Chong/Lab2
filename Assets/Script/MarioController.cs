@@ -7,11 +7,20 @@ public class MarioController : MonoBehaviour
     public float moveSpeed = 8f;
     public float jumpForce = 16f;
 
-    [Header("??????")]
+    [Header("状态引用")]
     public AnimatorOverrideController bigMarioController;
     private RuntimeAnimatorController smallMarioController;
     private SpriteRenderer spriteRenderer;
-    private BoxCollider2D col; // ?????????????????
+    private BoxCollider2D col;
+
+    [Header("火球")]
+    [Tooltip("火球 Prefab（需挂 FireballController，Collider2D 勾 Is Trigger）")]
+    public GameObject fireballPrefab;
+    [Tooltip("发射按键")]
+    public KeyCode fireKey = KeyCode.Z;
+    [Tooltip("同时存在的最大火球数")]
+    public int maxFireballs = 2;
+    private int activeFireballs;
 
     [Header("???????")]
     public LayerMask groundLayer;
@@ -66,10 +75,16 @@ public class MarioController : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }
 
-        // 5. ???????? (???? E ??)
+        // 5. 变身测试 (按下 E 键)
         if (Input.GetKeyDown(KeyCode.E) && !inPowerUpSequence)
         {
             StartCoroutine(PowerUpSequence());
+        }
+
+        // 6. 发射火球（仅大马里奥）
+        if (isBig && Input.GetKeyDown(fireKey) && fireballPrefab != null && activeFireballs < maxFireballs)
+        {
+            ShootFireball();
         }
 
         // --- ???? Animator ???? ---
@@ -105,7 +120,30 @@ public class MarioController : MonoBehaviour
         //}
     }
 
-    /// <summary> ????????????? MarioCombat ?????????????????????????????????? </summary>
+    private void ShootFireball()
+    {
+        int dir = spriteRenderer.flipX ? -1 : 1;
+        Vector3 spawnPos = new Vector3(transform.position.x + dir * 0.5f, transform.position.y, -2f);
+
+        GameObject fb = Instantiate(fireballPrefab, spawnPos, Quaternion.identity);
+        fb.GetComponent<FireballController>()?.Init(dir);
+
+        activeFireballs++;
+        // 火球销毁时还原计数
+        Destroy(fb, fb.GetComponent<FireballController>() != null
+            ? fb.GetComponent<FireballController>().maxDistance / Mathf.Max(fb.GetComponent<FireballController>().speed, 0.1f) + 0.1f
+            : 3f);
+        StartCoroutine(TrackFireball(fb));
+    }
+
+    private System.Collections.IEnumerator TrackFireball(GameObject fb)
+    {
+        while (fb != null)
+            yield return null;
+        activeFireballs = Mathf.Max(0, activeFireballs - 1);
+    }
+
+    /// <summary> 被怪物碰到时由 MarioCombat 调用，大马缩小，小马死亡 </summary>
     public void ShrinkToSmall()
     {
         if (!isBig) return;

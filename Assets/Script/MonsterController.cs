@@ -56,6 +56,24 @@ public class MonsterController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    /// <summary>
+    /// 被火球击中时调用。
+    /// 已是壳 → 直接给分并销毁；未变壳 → 和踩头效果一致（蘑菇死亡，乌龟变壳）
+    /// </summary>
+    public void KillByFireball()
+    {
+        if (isShell)
+        {
+            var scoreComp = GetComponent<MonsterStompScore>();
+            if (scoreComp != null) scoreComp.GrantStompScore();
+            Destroy(gameObject);
+            return;
+        }
+
+        // 未变壳时，效果等同踩头（蘑菇死亡动画销毁，乌龟变壳）
+        Stomped();
+    }
+
     /// <summary> 被主角踩头时由 MarioCombat 调用 </summary>
     public void Stomped()
     {

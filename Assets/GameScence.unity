@@ -6038,6 +6038,14 @@ PrefabInstance:
       propertyPath: stompBounceSpeed
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 5692795774705007166, guid: f12363c4a3af80f44a63151bd47ca211, type: 3}
+      propertyPath: maxFireballs
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5692795774705007166, guid: f12363c4a3af80f44a63151bd47ca211, type: 3}
+      propertyPath: fireballPrefab
+      value: 
+      objectReference: {fileID: 2142547655071028474, guid: 09ac07012145fb145b08f96d21b18826, type: 3}
     - target: {fileID: 6255554736074964270, guid: f12363c4a3af80f44a63151bd47ca211, type: 3}
       propertyPath: m_Name
       value: Mario
