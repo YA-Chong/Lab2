@@ -39,7 +39,30 @@ public class MarioCombat : MonoBehaviour
         var monster = collision.gameObject.GetComponent<MonsterController>();
         if (monster == null) return;
 
-        // 判定：是否从上方踩到（接触法线朝上 = 踩到敌人头顶）
+        // 滑动中的壳：伤害由 MonsterController.OnCollisionEnter2D 负责，这里跳过
+        if (monster.IsShell && monster.IsShellSliding) return;
+
+        // 静止壳：踩头 → 反弹并开始滑动；侧面 → 踢壳滑动，马里奥不受伤
+        if (monster.IsShell && !monster.IsShellSliding)
+        {
+            foreach (ContactPoint2D contact in collision.contacts)
+            {
+                if (contact.normal.y >= stompNormalYThreshold)
+                {
+                    // 从上方踩静止壳 → 弹起，壳按原方向滑动
+                    StompBounce();
+                    monster.StartSliding(monster.CurrentDirection);
+                    return;
+                }
+            }
+            // 从侧面碰静止壳 → 踢壳，方向为接触法线 X 的反向（推开方向）
+            ContactPoint2D firstContact = collision.contacts[0];
+            int kickDir = firstContact.normal.x > 0 ? 1 : -1;
+            monster.StartSliding(kickDir);
+            return;
+        }
+
+        // 普通敌人：踩头 → 踩死并反弹；侧面/下方 → 马里奥受伤
         foreach (ContactPoint2D contact in collision.contacts)
         {
             if (contact.normal.y >= stompNormalYThreshold)
@@ -50,7 +73,6 @@ public class MarioCombat : MonoBehaviour
             }
         }
 
-        // 从侧面或下面碰到 → 大马缩小，小马死亡
         if (marioController != null && marioController.IsBig)
         {
             marioController.ShrinkToSmall();

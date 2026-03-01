@@ -42,11 +42,17 @@ public class MonsterController : MonoBehaviour
     private Rigidbody2D rb;
     private bool stomped;
     private bool isShell;
+    private bool isShellSliding;
+    private bool ignorePlayerHit;
     private float shellSlideDistanceTraveled;
 
     /// <summary> 为 false 时不再移动（被踩、变壳等） </summary>
     [HideInInspector]
     public bool movementEnabled = true;
+
+    public bool IsShell => isShell;
+    public bool IsShellSliding => isShellSliding;
+    public int CurrentDirection => direction;
 
     private void Start()
     {
@@ -58,20 +64,33 @@ public class MonsterController : MonoBehaviour
 
     /// <summary>
     /// 被火球击中时调用。
-    /// 已是壳 → 直接给分并销毁；未变壳 → 和踩头效果一致（蘑菇死亡，乌龟变壳）
+    /// 壳/乌龟/蘑菇 → 均直接播死亡动画并销毁，乌龟不会变壳。
     /// </summary>
     public void KillByFireball()
     {
+        if (stomped && !isShell) return;
+
+        var scoreComp = GetComponent<MonsterStompScore>();
+        if (scoreComp != null) scoreComp.GrantStompScore();
+
+        // 停止移动
+        movementEnabled = false;
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+
+        var col = GetComponent<Collider2D>();
+        if (col != null) col.enabled = false;
+
         if (isShell)
         {
-            var scoreComp = GetComponent<MonsterStompScore>();
-            if (scoreComp != null) scoreComp.GrantStompScore();
+            // 壳没有死亡动画，直接瞬间销毁
             Destroy(gameObject);
-            return;
         }
-
-        // 未变壳时，效果等同踩头（蘑菇死亡动画销毁，乌龟变壳）
-        Stomped();
+        else
+        {
+            if (anim != null && !string.IsNullOrEmpty(stompAnimTrigger))
+                anim.SetTrigger(stompAnimTrigger);
+            Destroy(gameObject, stompDestroyDelay);
+        }
     }
 
     /// <summary> 被主角踩头时由 MarioCombat 调用 </summary>
@@ -87,18 +106,17 @@ public class MonsterController : MonoBehaviour
         if (becomeShellOnStomp)
         {
             isShell = true;
+            isShellSliding = false;
             if (anim != null && !string.IsNullOrEmpty(shellAnimBool))
                 anim.SetBool(shellAnimBool, true);
             if (spriteRenderer != null) spriteRenderer.flipX = false;
 
+            // 静止壳：Kinematic 锁死位置，等待被踩或被踢后再开始滑动
             if (rb != null)
             {
-                // 保持 Dynamic，让物理引擎真正阻挡碰撞；关掉重力，只水平滑动
-                rb.bodyType = RigidbodyType2D.Dynamic;
-                rb.gravityScale = 0f;
-                rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-                rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-                rb.linearVelocity = new Vector2(direction * shellSlideSpeed, 0f);
+                rb.bodyType = RigidbodyType2D.Kinematic;
+                rb.linearVelocity = Vector2.zero;
+                rb.constraints = RigidbodyConstraints2D.FreezePosition | RigidbodyConstraints2D.FreezeRotation;
             }
             return;
         }
@@ -113,22 +131,47 @@ public class MonsterController : MonoBehaviour
             Destroy(gameObject, stompDestroyDelay);
     }
 
+    /// <summary> 由 MarioCombat 调用，让静止壳开始朝指定方向滑动 </summary>
+    public void StartSliding(int slideDirection)
+    {
+        direction = slideDirection;
+        isShellSliding = true;
+
+        if (rb != null)
+        {
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.gravityScale = 0f;
+            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            rb.linearVelocity = new Vector2(direction * shellSlideSpeed, 0f);
+        }
+
+        // 刚开始滑动时短暂忽略对马里奥的伤害，避免变 Dynamic 瞬间触发重叠碰撞
+        StartCoroutine(IgnorePlayerHitBriefly());
+    }
+
+    private System.Collections.IEnumerator IgnorePlayerHitBriefly()
+    {
+        ignorePlayerHit = true;
+        yield return new WaitForSeconds(0.15f);
+        ignorePlayerHit = false;
+    }
+
     private void FixedUpdate()
     {
-        if (isShell && rb != null)
-        {
-            // 保持速度恒定（Dynamic 刚体受摩擦力等可能减速）
-            rb.linearVelocity = new Vector2(direction * shellSlideSpeed, rb.linearVelocity.y);
+        if (!isShellSliding || rb == null) return;
 
-            shellSlideDistanceTraveled += shellSlideSpeed * Time.fixedDeltaTime;
-            if (shellSlideDistanceTraveled >= shellMaxDistance)
-                Destroy(gameObject);
-        }
+        // 保持速度恒定（Dynamic 刚体受摩擦力等可能减速）
+        rb.linearVelocity = new Vector2(direction * shellSlideSpeed, rb.linearVelocity.y);
+
+        shellSlideDistanceTraveled += shellSlideSpeed * Time.fixedDeltaTime;
+        if (shellSlideDistanceTraveled >= shellMaxDistance)
+            Destroy(gameObject);
     }
 
     private void Update()
     {
-        if (isShell) return;
+        if (isShell || isShellSliding) return;
 
         if (!movementEnabled) return;
 
@@ -147,19 +190,28 @@ public class MonsterController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (isShell)
+        // 滑动中的壳：撞到马里奥伤害（忽略刚开始滑动的短暂窗口），撞到其他东西反向
+        if (isShellSliding)
         {
             if (collision.gameObject.CompareTag("Mario"))
             {
-                var combat = collision.gameObject.GetComponent<MarioCombat>();
-                if (combat != null) combat.OnHitByEnemy();
+                if (!ignorePlayerHit)
+                {
+                    var combat = collision.gameObject.GetComponent<MarioCombat>();
+                    if (combat != null) combat.OnHitByEnemy();
+                }
             }
-            // 撞墙或撞到马里奥后反向，更新速度方向
-            direction *= -1;
-            if (rb != null)
-                rb.linearVelocity = new Vector2(direction * shellSlideSpeed, rb.linearVelocity.y);
+            else
+            {
+                direction *= -1;
+                if (rb != null)
+                    rb.linearVelocity = new Vector2(direction * shellSlideSpeed, rb.linearVelocity.y);
+            }
             return;
         }
+
+        // 静止壳：由 MarioCombat 处理，这里不做任何事
+        if (isShell) return;
 
         if (!movementEnabled || stomped) return;
         direction *= -1;
