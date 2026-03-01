@@ -23,6 +23,15 @@ public class GameManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    private void Start()
+    {
+        // 【新增】每次关卡重新加载（或复活）时，通知老员工 AudioManager 重新播放 BGM
+        if (AudioManager.Instance != null && AudioManager.Instance.mainThemeBGM != null)
+        {
+            AudioManager.Instance.PlayBGM(AudioManager.Instance.mainThemeBGM);
+        }
+    }
+
     /// <summary> 触发胜利（到达终点） </summary>
     public void GameWin()
     {

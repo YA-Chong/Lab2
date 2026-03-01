@@ -78,6 +78,10 @@ public class MarioController : MonoBehaviour
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+
+            // 【新增音效】播放跳跃声音
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySFX(AudioManager.Instance.jumpClip);
         }
 
         // 5. 变身测试 (按下 E 键)
@@ -102,6 +106,10 @@ public class MarioController : MonoBehaviour
     {
         inPowerUpSequence = true;
         anim.SetTrigger("onPowerUp");
+
+        // 【新增音效】播放吃蘑菇变大声音
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.powerUpClip);
 
         yield return new WaitForSeconds(0.5f);
 
@@ -135,6 +143,10 @@ public class MarioController : MonoBehaviour
 
     private void ShootFireball()
     {
+        // 【新增音效】播放发射火球声音
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.fireballClip);
+
         int dir = spriteRenderer.flipX ? -1 : 1;
         Vector3 spawnPos = new Vector3(transform.position.x + dir * 0.5f, transform.position.y, -2f);
 
@@ -174,6 +186,10 @@ public class MarioController : MonoBehaviour
     {
         if (!isBig) return;
         isBig = false;
+
+        // 【新增音效】播放受伤缩小的声音
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.shrinkClip);
 
         if (bigMarioTimerCoroutine != null)
         {

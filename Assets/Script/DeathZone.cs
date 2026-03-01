@@ -7,6 +7,13 @@ public class DeathZone : MonoBehaviour
         // 如果碰到的是马里奥
         if (collision.CompareTag("Mario"))
         {
+            // 【新增音效同步】停止欢快的背景音乐，播放死亡音效
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.StopBGM();
+                AudioManager.Instance.PlaySFX(AudioManager.Instance.deathClip);
+            }
+
             // 1. 剥夺控制权：获取马里奥的移动脚本并禁用，让他无法再接收玩家的按键输入
             var controller = collision.GetComponent<MarioController>();
             if (controller != null)

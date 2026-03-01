@@ -63,6 +63,10 @@ public class MarioCombat : MonoBehaviour
     {
         if (rb != null)
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, stompBounceSpeed);
+
+        // 【新增音效】播放踩敌人的声音
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.stompClip);
     }
 
     /// <summary> 被龟壳等击中时由 MonsterController 调用，效果同被怪物侧面碰到（大马缩小，小马死亡） </summary>
@@ -81,6 +85,10 @@ public class MarioCombat : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
+
+        // 【新增音效】播放死亡声音
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX(AudioManager.Instance.deathClip);
 
         if (marioController != null)
             marioController.enabled = false;
