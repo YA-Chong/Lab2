@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: -277819920914248800}
   - component: {fileID: 992514697780739285}
   - component: {fileID: 5886158195911632792}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LuckyBrick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,6 +132,7 @@ MonoBehaviour:
   bounceSpeed: 12
   coinPrefab: {fileID: 1418590578301304864, guid: f96b53231bb47ba469b83ed0e9983ac0, type: 3}
   coinSpawnHeight: 0.6
+  powerUpPrefab: {fileID: 0}
   usedSprite: {fileID: 5508725064705088119, guid: 6142ef44f9505444588aa26f5a6be9b3, type: 3}
 --- !u!61 &5886158195911632792
 BoxCollider2D:
